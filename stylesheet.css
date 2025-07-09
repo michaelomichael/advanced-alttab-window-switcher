@@ -160,8 +160,10 @@
 }
 
 .title-label-dark, .title-label-light, .title-label {
-  font-size: 0.9em;
   background-color: rgba(0, 0, 0, 0.0);
+  font-size: 1.6em;
+  text-align: left;
+  margin-left: 0.5em;
 }
 
 /* space between switcher items */

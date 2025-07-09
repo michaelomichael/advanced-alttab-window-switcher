@@ -26,7 +26,8 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 // gettext
 let _;
 
-const LABEL_FONT_SIZE = 0.9;
+// MO: This is largely overridden by what's in stylesheet.css's `.title-label-*` rules.
+const LABEL_FONT_SIZE = 1.7;
 
 // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -63,9 +64,9 @@ export const WindowIcon = GObject.registerClass({
             reactive: true,
         });
         if (this.orientation !== undefined) // since GS 48
-            this.orientation = Clutter.Orientation.VERTICAL;
+            this.orientation = Clutter.Orientation.HORIZONTAL;
         else
-            this.vertical = true;
+            this.vertical = false;
         this._opt = opt;
         this._switcherParams = switcherParams;
         this._icon = new St.Widget({ layout_manager: new Clutter.BinLayout() });
@@ -81,8 +82,11 @@ export const WindowIcon = GObject.registerClass({
             this._icon.add_child(this._hotkeyIndicator);
         }
 
-        if (this.titleLabel && this._switcherParams.showWinTitles)
+        console.log("MOTEST: In WindowIcon._init(), this.titleLabel=", this.titleLabel, ", this._switcherParams.showWinTitles=", this._switcherParams.showWinTitles);
+        if (this.titleLabel && this._switcherParams.showWinTitles) {
+            console.log("MOTEST:   Adding titleLabel as a child");
             this.add_child(this.titleLabel);
+        }
     }
 
     _createCloseButton(metaWin) {
@@ -117,8 +121,12 @@ export const WindowIcon = GObject.registerClass({
         this.titleLabel = new St.Label({
             text: title,
             style_class: this._opt.colorStyle.TITLE_LABEL,
-            x_align: Clutter.ActorAlign.CENTER,
+            x_align: Clutter.ActorAlign.START,
+            y_align: Clutter.ActorAlign.CENTER,
+            width: 800,
         });
+
+        this.titleLabel.get_clutter_text().set_ellipsize(2); // Pango.MIDDLE
 
         let tracker = Shell.WindowTracker.get_default();
         this.app = tracker.get_window_app(window);
@@ -137,36 +145,31 @@ export const WindowIcon = GObject.registerClass({
             cloneSize = Math.floor((mutterWindow.width / mutterWindow.height) * this._switcherParams.winPrevSize);
         }
 
-        let clone = _createWindowClone(mutterWindow, cloneSize * scaleFactor);
-        let icon;
+        // let clone = _createWindowClone(mutterWindow, cloneSize * scaleFactor);
+        let appicon;
 
         if (this.app && this._opt.APP_ICON_SIZE) {
-            icon = this._createAppIcon(this.app,
+            appicon = this._createAppIcon(this.app,
                 this._opt.APP_ICON_SIZE);
-            this._appIcon = icon;
+            this._appIcon = appicon;
             this._appIcon.reactive = false;
         }
 
         let base, front;
-        if (switched) {
-            base  = icon;
-            front = clone;
-        } else {
-            base  = clone;
-            front = icon;
-        }
+        base  = appicon;
+        // front = clone;
 
         if (this.window.minimized && this._opt.MARK_MINIMIZED)
-            front.opacity = 80;
+            base.opacity = 80;
 
         this._icon.add_child(base);
-        if (front) {
-            this._alignFront(front);
-            this._icon.add_child(front);
-        }
+        // if (front) {
+        //     this._alignFront(front);
+        //     this._icon.add_child(front);
+        // }
 
         // will be used to connect on icon signals (switcherList.icons[n]._front)
-        this._front = front;
+        this._front = appicon;
 
         if (this.window.is_above() || this.window.is_on_all_workspaces())
             this._icon.add_child(this._getIndicatorBox());
@@ -176,6 +179,8 @@ export const WindowIcon = GObject.registerClass({
             this._wsIndicator = this._createWsIcon(window.get_workspace().index() + 1);
             this._icon.add_child(this._wsIndicator);
         }
+
+        this.add_child(this.titleLabel);
 
         this._icon.set_size(size * scaleFactor, size * scaleFactor);
     }

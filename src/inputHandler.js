@@ -245,18 +245,21 @@ export class InputHandler {
     }
 
     _handleTabKey(action) {
-        if (this._wsp._singleApp)
-            this._wsp._toggleSingleAppMode();
+        // if (this._wsp._singleApp)
+        //     this._wsp._toggleSingleAppMode();
 
         if (this._opt.SECOND_TAB_SWITCH && !this._wsp._allowFilterSwitchOnOnlyItem && this._wsp._items.length === 1) {
             this._wsp._allowFilterSwitchOnOnlyItem = true;
             this._wsp._updateSwitcher();
         }
 
-        if (!this._wsp._singleApp && this._shiftPressed() || this._isTabBackwardAction(action))
+        if (this._shiftPressed() || this._isTabBackwardAction(action)) {
+            // if (!this._wsp._singleApp && this._shiftPressed() || this._isTabBackwardAction(action))
             this._wsp._select(this._wsp._previous());
-        else if (!this._wsp._singleApp)
+        } else {
+            // else if (!this._wsp._singleApp)
             this._wsp._select(this._wsp._next());
+        }
     }
 
     _isSwitchGroupAction(action, keysym) {

@@ -58,6 +58,11 @@ export const SwitcherList = GObject.registerClass({
         this._switcherParams = this._getSwitcherParams(opt, wsp);
         this._wsp = wsp;
 
+        if (this._list.orientation !== undefined) // since GS 48
+            this._list.orientation = Clutter.Orientation.VERTICAL;
+        else
+            this._list.vertical = true;
+
         this._addStatusLabel();
 
         this.icons = [];
