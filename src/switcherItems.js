@@ -82,9 +82,7 @@ export const WindowIcon = GObject.registerClass({
             this._icon.add_child(this._hotkeyIndicator);
         }
 
-        console.log("MOTEST: In WindowIcon._init(), this.titleLabel=", this.titleLabel, ", this._switcherParams.showWinTitles=", this._switcherParams.showWinTitles);
         if (this.titleLabel && this._switcherParams.showWinTitles) {
-            console.log("MOTEST:   Adding titleLabel as a child");
             this.add_child(this.titleLabel);
         }
     }
